@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KambuChia</title>
+<meta name="description" content="Split the bills, see who pays whom, open Swish.">
+<meta property="og:title" content="KambuChia">
+<meta property="og:description" content="Split the bills, see who pays whom, open Swish.">
+<meta property="og:image" content="media/gallery/1.jpg">
+<meta name="theme-color" content="#0e6b5c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='9' y='3' width='14' height='4' rx='1.5' fill='%230e6b5c'/%3E%3Cpath d='M8 9h16v17a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4z' fill='%23f2a93b'/%3E%3Ccircle cx='13' cy='17' r='1.6' fill='%23fff'/%3E%3Ccircle cx='19' cy='21' r='2.2' fill='%23fff'/%3E%3Ccircle cx='14.5' cy='25' r='1.2' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- GitHub Pages caches every file for 10 min: load our own files fresh on every visit, so a new payment shows on refresh -->
+<script>window.V = Date.now(); document.write('<link rel="stylesheet" href="styles.css?v=' + V + '">');</script>
+<noscript><link rel="stylesheet" href="styles.css"></noscript>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <button class="hero-photo" id="coverBtn" aria-label="Open the photo"><img id="cover" src="media/gallery/1.jpg" alt=""></button>
+    <p class="brand"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true"><rect x="9" y="3" width="14" height="4" rx="1.5" fill="currentColor"/><path d="M8 9h16v17a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4z" fill="#f2a93b"/><circle cx="13" cy="17" r="1.6" fill="#fff"/><circle cx="19" cy="21" r="2.2" fill="#fff"/><circle cx="14.5" cy="25" r="1.2" fill="#fff"/></svg>KambuChia</p>
+    <div class="hero-text">
+      <p class="kicker" id="kicker"></p>
+      <h1 id="title"></h1>
+    </div>
+  </header>
+
+  <nav class="events" id="events" aria-label="Events" hidden></nav>
+
+  <ul class="faces" id="faces" aria-label="Who's in"></ul>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="pay" aria-selected="true">Pay</button>
+    <button role="tab" data-tab="bills" aria-selected="false">Bills</button>
+    <button role="tab" data-tab="pics" aria-selected="false">Photos</button>
+  </nav>
+
+  <main class="grid">
+    <section class="panel" id="panel-pay" aria-label="Pay">
+      <h2 class="h">Who pays whom</h2>
+      <div id="payList"></div>
+    </section>
+    <section class="panel" id="panel-bills" aria-label="Bills">
+      <h2 class="h">Bills</h2>
+      <div id="billList"></div>
+    </section>
+    <section class="panel" id="panel-pics" aria-label="Photos">
+      <h2 class="h">Photos</h2>
+      <div id="picList"><div class="strip"><div class="track" id="track"></div>
+        <button class="nav prev" aria-label="Previous">‹</button><button class="nav next" aria-label="Next">›</button></div></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="qrBox" class="modal" aria-labelledby="qrTitle">
+  <header class="modal-head"><h2 id="qrTitle"></h2><button class="x" id="qrClose" aria-label="Close">✕</button></header>
+  <div class="seg" id="qrSeg" role="tablist"></div>
+  <label class="qr-amt" id="qrAmtWrap"><input id="qrAmtIn" inputmode="decimal" placeholder="0" aria-label="Amount"><span id="qrUnit">kr</span></label>
+  <p class="qr-amt" id="qrAmt"></p>
+  <p class="qr-sub" id="qrSub"></p>
+  <div class="qr-code" id="qrCode"></div>
+  <p class="qr-none" id="qrNone" hidden></p>
+  <div class="qr-acct" id="qrAcct"></div>
+  <a class="qr-open" id="qrOpen" target="_blank" rel="noopener">Open Swish</a>
+  <div class="qr-apps" id="qrApps"></div>
+</dialog>
+
+<dialog id="viewer" class="viewer" aria-label="Photo">
+  <button class="x v-x" id="vClose" aria-label="Close">✕</button>
+  <button class="v-nav v-prev" id="vPrev" aria-label="Previous">‹</button>
+  <div class="v-track" id="vTrack"></div>
+  <button class="v-nav v-next" id="vNext" aria-label="Next">›</button>
+  <div class="v-dots" id="vDots"></div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>['data.js', 'app.js'].forEach(f => { const s = document.createElement('script'); s.src = f + '?v=' + V; s.async = false; document.body.appendChild(s); });</script>
+</body>
+</html>
