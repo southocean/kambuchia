@@ -8,7 +8,7 @@ window.PEOPLE = [
   { id: 'nam', name: 'Nam', color: '#2f7de1', face: 'media/people/nam.jpg', pay: [{ kind: 'swish', n: 'MjU4NTQ2NTI3NjQ=' }] },
   { id: 'tracy', name: 'Tracy', color: '#1f9e89', face: 'media/people/tracy.jpg', pay: [] },
   { id: 'jane', name: 'Jane', color: '#e08a1e', face: 'media/people/jane.jpg', pay: [] },
-  { id: 'emma', name: 'Emma', color: '#d94f8a', face: 'media/people/emma.jpg', pay: [] },
+  { id: 'emma', name: 'Emma', color: '#d94f8a', face: 'media/people/emma.jpg', pay: [{ kind: 'swish', n: 'MzIzMTQ1NTY3NjQ=' }] },
   { id: 'dauto', name: 'Dauto', color: '#7a5af0', face: 'media/people/dauto.jpg', pay: [] },
   { id: 'joakim', name: 'Joakim', color: '#c0392b', face: 'media/people/joakim.jpg', pay: [] },
   { id: 'huy', name: 'Huy', color: '#0e8fb3', face: 'media/people/huy.jpg', pay: [] },
