@@ -19,19 +19,25 @@ window.PEOPLE = [
   { id: 'thu', name: 'Autumn', color: '#b0762b', face: 'media/people/autumn.jpg', photo: 'media/people/full/autumn.jpg', pay: [] },
 ];
 
+// The only people who may send more than one Swish to settle an event (an event can set its own
+// `squarers`). Everyone else sends at most one, and is never asked to pass money on.
+window.SQUARERS = ['nam', 'tracy', 'jane', 'emma'];
+
 // Newest first: the site opens on EVENTS[0].
 // crew: who splits; hub (optional): everyone settles through them; bills.for (optional): who
 // shares that bill (default: the crew); bills.own: the payer's own items, taken off before splitting.
 // payments made: { from, to, kr, date, photo }. photos[0] is the cover; more go to the gallery.
+const GAME = ['emma', 'dauto', 'huy', 'toan', 'jane', 'tony', 'son', 'nam', 'tracy'];
 window.EVENTS = [
   {
     id: 'activate-hotpot',
     title: 'Activate Hotpot',
     date: '2026-11-14',
     crew: ['joakim', 'emma', 'dauto', 'huy', 'toan', 'jane', 'tony', 'son', 'nam', 'tracy', 'xuan', 'thu'],
+    // Joakim, Spring and Autumn skipped the game: Activate splits over the other 9 (125 kr each)
     bills: [
-      { by: 'jane', what: 'Activate', sub: 'Game', icon: '🎮', kr: 750 },
-      { by: 'dauto', what: 'Activate', sub: 'Game', icon: '🎮', kr: 375 },
+      { by: 'jane', what: 'Activate', sub: 'Game', icon: '🎮', for: GAME, kr: 750 },
+      { by: 'dauto', what: 'Activate', sub: 'Game', icon: '🎮', for: GAME, kr: 375 },
       { by: 'tracy', what: 'Hemköp', sub: 'Mall of Scandinavia · meat & drinks', icon: '🥩', kr: 832.64, own: 116.08, ownWhat: 'kamben ×3', photo: 'media/receipts/hemkop.jpg' },
       { by: 'emma', what: 'ICA Kvantum', sub: 'Mall of Scandinavia · veggies & tofu', icon: '🥬', kr: 308.20, photo: 'media/receipts/ica-mos.jpg' },
       { by: 'tracy', what: 'ICA Supermarket', sub: 'Vanadis · drinks, chips & ice', icon: '🥤', kr: 225.86, photo: 'media/receipts/ica-vanadis.jpg' },

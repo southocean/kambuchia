@@ -35,9 +35,10 @@
       b0[b.by] = (b0[b.by] || 0) + kr;
       split.forEach(id => { b0[id] -= kr / split.length; });
     });
-    const whole = EV.crew.map(id => ({ id, v: Math.round(b0[id]) }));
+    // debts round UP to the next krona and credits to the nearest, so the bill payers never come up
+    // short; the few spare kronor from rounding land on the biggest credit
+    const whole = EV.crew.map(id => ({ id, v: b0[id] < 0 ? -Math.ceil(-b0[id] - 1e-9) : Math.round(b0[id]) }));
     const rest = whole.reduce((t, x) => t + x.v, 0);
-    // a leftover krona from rounding lands on the biggest credit, so every debt is its plain rounded share
     if (rest) whole.reduce((m, x) => x.v > m.v ? x : m).v -= rest;
     const out = { bal: Object.fromEntries(whole.map(x => [x.id, x.v])), pay: [] };
     if (EV.hub) {
@@ -45,15 +46,23 @@
       whole.filter(x => x.id !== EV.hub && x.v > 0).forEach(x => out.pay.push({ from: EV.hub, to: x.id, kr: x.v }));
       return out;
     }
-    // Everyone who owes sends ONE Swish: to whoever is still owed the most (that may tip them past
-    // what they're owed). Then those who paid the bills square the leftovers among themselves.
+    // Everyone else sends at most ONE Swish and never passes money on; only the squarers (Nam, Tracy,
+    // Jane, Emma by default) may send more. A one-Swish debt goes to someone it fits whole (an exact
+    // match first, else the tightest fit), and only a squarer may be tipped past what they're owed.
+    // Then the squarers who were tipped over pay out what's still owed.
+    const sq = new Set((EV.squarers || window.SQUARERS || []).filter(id => EV.crew.includes(id)));
     const rem = Object.fromEntries(whole.filter(x => x.v > 0).map(x => [x.id, x.v]));
-    whole.filter(x => x.v < 0).sort((a, b) => a.v - b.v).forEach(x => {
-      const to = Object.keys(rem).reduce((m, id) => rem[id] > rem[m] ? id : m);
-      out.pay.push({ from: x.id, to, kr: -x.v });
-      rem[to] += x.v;
+    const once = whole.filter(x => x.v < 0 && !sq.has(x.id)).sort((a, b) => a.v - b.v);
+    const owing = whole.filter(x => x.v < 0 && sq.has(x.id)).map(x => ({ id: x.id, v: -x.v }));
+    once.forEach(x => {
+      const kr = -x.v, open = Object.keys(rem).filter(id => rem[id] > 0);
+      const fits = open.filter(id => rem[id] >= kr).sort((a, b) => rem[a] - rem[b]);
+      const to = fits.find(id => rem[id] === kr) || fits[0]
+        || [...open].sort((a, b) => (sq.has(b) - sq.has(a)) || (rem[b] - rem[a]))[0];
+      out.pay.push({ from: x.id, to, kr });
+      rem[to] -= kr;
     });
-    const debt = Object.entries(rem).filter(([, v]) => v < 0).map(([id, v]) => ({ id, v: -v }));
+    const debt = owing.concat(Object.entries(rem).filter(([, v]) => v < 0).map(([id, v]) => ({ id, v: -v })));
     const cred = Object.entries(rem).filter(([, v]) => v > 0).map(([id, v]) => ({ id, v }));
     while (debt.length && cred.length) {
       debt.sort((a, b) => b.v - a.v); cred.sort((a, b) => b.v - a.v);

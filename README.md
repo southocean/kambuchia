@@ -7,8 +7,9 @@ Built on [Bị ốm birthday](https://github.com/southocean/bi-om-birthday).
 - Everything is in `data.js`: `PEOPLE` (everyone, their face and Swish), `EVENTS` (newest first:
   crew, bills, payments made, photos).
 - A bill's `own` is the payer's own items, taken off before splitting; `for` limits who shares it.
-- Settling: everyone who owes sends one Swish; the bill payers square the leftovers among themselves
-  (or set `hub` on an event to settle everything through one person).
+- Settling: everyone sends at most one Swish, except the squarers (`SQUARERS` in `data.js`: Nam, Tracy,
+  Jane, Emma), who pass on whatever is left. Debts round up to the next krona.
+  (Or set `hub` on an event to settle everything through one person.)
 - Mark a payment made: add `{ from, to, kr, date, photo }` to the event's `payments` (blur phone numbers).
 - Missing Swish numbers: see [NUMBERS.md](NUMBERS.md).
 - Local preview: `node tools/serve.js` → http://localhost:5180
