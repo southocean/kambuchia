@@ -132,6 +132,24 @@
     scrollTo({ top: 0, behavior: 'smooth' });
   });
 
+  // ── the logo: slash "Chia", split it, say what chia means ──
+  const brand = $('#brand');
+  let brandT = [];
+  function playBrand() {
+    brandT.forEach(clearTimeout);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { brand.classList.add('cut'); return; }
+    brand.classList.remove('cut', 'slash', 'hint');
+    void brand.offsetWidth;
+    brandT = [
+      setTimeout(() => brand.classList.add('slash'), 450),
+      setTimeout(() => brand.classList.add('cut'), 650),
+      setTimeout(() => brand.classList.add('hint'), 1000),
+      setTimeout(() => brand.classList.remove('hint'), 4200),
+    ];
+  }
+  brand.addEventListener('click', playBrand);
+  playBrand();
+
   // ── pay ────────────────────────────────────────────────
   function renderPay() {
     const rows = pay.map((t, i) => {

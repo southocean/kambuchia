@@ -21,7 +21,17 @@
 <div class="app">
   <header class="hero">
     <button class="hero-photo" id="coverBtn" aria-label="Open the photo"><img id="cover" src="media/gallery/1.jpg" alt=""></button>
-    <p class="brand"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true"><rect x="9" y="3" width="14" height="4" rx="1.5" fill="currentColor"/><path d="M8 9h16v17a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4z" fill="#f2a93b"/><circle cx="13" cy="17" r="1.6" fill="#fff"/><circle cx="19" cy="21" r="2.2" fill="#fff"/><circle cx="14.5" cy="25" r="1.2" fill="#fff"/></svg>KambuChia</p>
+    <button class="brand" id="brand" type="button" aria-label="KambuChia (chia means split in Vietnamese)">
+      <svg class="b-bottle" viewBox="0 0 32 32" width="21" height="21" aria-hidden="true">
+        <defs>
+          <g id="bot"><rect x="9" y="3" width="14" height="4" rx="1.5" fill="#7fd8c6"/><path d="M8 9h16v17a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4z" fill="#f2a93b"/><circle cx="13" cy="17" r="1.6" fill="#fff"/><circle cx="19" cy="21" r="2.2" fill="#fff"/><circle cx="14.5" cy="25" r="1.2" fill="#fff"/></g>
+          <clipPath id="botL"><rect width="16" height="32"/></clipPath><clipPath id="botR"><rect x="16" width="16" height="32"/></clipPath>
+        </defs>
+        <g class="half l" clip-path="url(#botL)"><use href="#bot"/></g><g class="half r" clip-path="url(#botR)"><use href="#bot"/></g>
+      </svg>
+      <span class="b-word" aria-hidden="true">Kambu<span class="b-chia"><span class="pc top">Chia</span><span class="pc bot">Chia</span><i class="blade"></i></span></span>
+      <span class="b-hint" aria-hidden="true"><span>chia = split</span></span>
+    </button>
     <div class="hero-text">
       <p class="kicker" id="kicker"></p>
       <h1 id="title"></h1>
