@@ -181,15 +181,47 @@
   brand.addEventListener('click', playBrand);
   playBrand();
 
+  // ── "I've paid": shared ticks (Google Sheet via tools/ticks.gs; tools/serve.js locally) ──
+  // A tick is on trust: whoever taps it marks that payment paid for everyone. Payments listed in
+  // data.js (EV.payments, with receipts) count as paid too and can't be unticked.
+  const TICKS = (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '/ticks' : '') || window.TICKS_URL || '';
+  const TICKS_ON = !!TICKS;
+  let ticks = {};
+  const tickKey = t => `${EV.id}|${t.from}|${t.to}`;
+  const inData = t => (EV.payments || []).filter(p => p.from === t.from && p.to === t.to).reduce((s, p) => s + p.kr, 0) >= t.kr - 0.5;
+  const isPaid = t => inData(t) || !!(ticks[tickKey(t)] && ticks[tickKey(t)].paid);
+  function takeTicks(next) {
+    if (!next || next.error) return;
+    const before = pay.filter(isPaid).map(tickKey).join();
+    ticks = next;
+    if (pay.filter(isPaid).map(tickKey).join() === before) return;
+    renderPay(); playTicks();
+  }
+  function loadTicks() {
+    if (!TICKS_ON || document.hidden) return;
+    fetch(TICKS, { cache: 'no-store' }).then(r => r.json()).then(takeTicks).catch(() => {});
+  }
+  function setTick(t, paid) {
+    const key = tickKey(t), old = ticks[key];
+    takeTicks({ ...ticks, [key]: { paid, kr: t.kr, at: new Date().toISOString() } });
+    // text/plain keeps it a "simple" request, which Apps Script accepts without a CORS preflight
+    return fetch(TICKS, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ key, paid, kr: t.kr }) })
+      .then(r => r.json()).then(takeTicks)
+      .catch(() => {
+        const back = { ...ticks }; if (old) back[key] = old; else delete back[key];
+        takeTicks(back); alert("Couldn't save that. Check your connection and try again.");
+      });
+  }
+
   // ── pay ────────────────────────────────────────────────
   function renderPay() {
     const rows = pay.map((t, i) => {
       const made = (EV.payments || []).filter(p => p.from === t.from && p.to === t.to);
-      const done = made.reduce((s, p) => s + p.kr, 0) >= t.kr - 0.5, receipt = made.find(p => p.photo);
+      const done = isPaid(t), receipt = made.find(p => p.photo);
       const to = person(t.to), m = to.pay[t.m], bank = m && m.kind === 'bank';
       const via = !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
       return `<li class="pay-row${done ? ' paid' : ''}${m ? '' : ' nonum'}" style="--from:${person(t.from).color};--to:${to.color}">
-        <button class="pay-btn" data-i="${i}"${receipt ? ` data-receipt="${esc(receipt.photo)}"` : ''}${done && !receipt ? ' disabled' : ''} aria-label="${esc(person(t.from).name)} pays ${esc(to.name)} ${t.kr} kr${done ? ', paid' : ''}">
+        <button class="pay-btn" data-i="${i}"${receipt ? ` data-receipt="${esc(receipt.photo)}"` : ''}${done && !receipt && !TICKS_ON ? ' disabled' : ''} aria-label="${esc(person(t.from).name)} pays ${esc(to.name)} ${t.kr} kr${done ? ', paid' : ''}">
           <span class="pair">${face(t.from)}<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 12" width="22" height="11"><path d="M0 6h20M15 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${face(t.to)}</span>
           <span class="who"><b>${esc(person(t.from).name)} <i>→</i> ${esc(to.name)}</b><small>${esc(via)}</small></span>
           <span class="amt"><b>${krTxt(t.kr, 0)}</b>${bank ? `<small>${vndTxt(vnd(t.kr))}</small>` : ''}</span>
@@ -213,7 +245,7 @@
   $('#payList').addEventListener('click', e => {
     const b = e.target.closest('.pay-btn'); if (!b) return;
     if (b.dataset.receipt) openViewer([{ src: b.dataset.receipt, alt: 'Receipt' }], 0);
-    else if (!b.closest('.paid')) openPay(pay[+b.dataset.i]);
+    else if (!b.closest('.paid') || TICKS_ON) openPay(pay[+b.dataset.i]);
   });
   // the tick: a second after a paid row comes into view; every time the tab opens, it plays again
   const paidIO = 'IntersectionObserver' in window && new IntersectionObserver(es => es.forEach(e => {
@@ -306,6 +338,9 @@
     $('#qrTitle').innerHTML = t.from
       ? `${face(t.from, 'sm')}<span>${esc(person(t.from).name)}</span><i>→</i>${face(t.to, 'sm')}<span>${esc(to.name)}</span>`
       : `<span>Pay</span>${face(t.to, 'sm')}<span>${esc(to.name)}</span>`;
+    const canTick = TICKS_ON && !!t.from && !inData(t), ticked = canTick && isPaid(t);
+    box.classList.toggle('ticked', ticked); box.classList.toggle('can-tick', canTick);
+    $('#qrPaid').textContent = ticked ? 'Paid ✓  ·  undo' : "I've paid";
     const hero = $('#qrHero'), big = !t.from && to.face;
     hero.hidden = !big; if (big) { hero.src = to.photo || to.face; hero.alt = to.name; }
     // phones: Open Swish first, the QR code only on request (and closing it closes the card);
@@ -368,6 +403,10 @@
   $('#qrClose').onclick = closeBox;
   $('#qrShow').onclick = () => box.classList.add('qr-on');
   $('#qrDone').onclick = closeBox;
+  $('#qrPaid').onclick = () => {
+    const t = pay.find(x => x.from === cur.from && x.to === cur.to); if (!t) return;
+    setTick(t, !isPaid(t)); closeBox();
+  };
   box.addEventListener('click', e => { if (e.target === box) closeBox(); });
   box.addEventListener('cancel', e => { e.preventDefault(); closeBox(); });
 
@@ -446,5 +485,10 @@
     renderHead(); renderPay(); renderBills(); renderPics();
     showTab('pay'); playTicks();
   }
+  if (TICKS_ON) {
+    setInterval(loadTicks, 20000);
+    document.addEventListener('visibilitychange', loadTicks);
+  }
   show(EVENTS.slice().sort((a, b) => b.date.localeCompare(a.date))[0]);
+  loadTicks();
 })();

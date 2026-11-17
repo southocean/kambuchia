@@ -27,6 +27,10 @@ window.SQUARERS = ['nam', 'tracy', 'jane', 'emma'];
 // household's net amount goes out to or comes in from everyone else.
 window.COUPLES = [['tony', 'tracy'], ['joakim', 'emma'], ['dauto', 'xuan']];
 
+// Where the "I've paid" ticks are shared: the Google Apps Script web app from tools/ticks.gs
+// (its /exec URL). Empty: no "I've paid" button. The local preview uses tools/serve.js instead.
+window.TICKS_URL = '';
+
 // Newest first: the site opens on EVENTS[0].
 // crew: who splits; hub (optional): everyone settles through them; bills.for (optional): who
 // shares that bill (default: the crew); bills.own: the payer's own items, taken off before splitting.
