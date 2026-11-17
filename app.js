@@ -234,9 +234,13 @@
     clearTimeout(zapT);
     zapT = setTimeout(() => {
       if (document.hidden || document.querySelector('dialog[open]')) return zapLater(8000);
+      // only a face you can fully see right now: wholly inside the window, not already split, and
+      // the topmost thing at its centre (so not scrolled out of the face row or covered)
       const vis = [...document.querySelectorAll('#faces img.av, #payList .pair img.av')].filter(el => {
+        if (el.closest('.split')) return false;
         const r = el.getBoundingClientRect();
-        return r.width > 24 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+        if (r.width < 24 || r.top < 0 || r.left < 0 || r.bottom > innerHeight || r.right > innerWidth) return false;
+        return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === el;
       });
       if (vis.length) zap(vis[Math.floor(Math.random() * vis.length)]);
       zapLater(35000 + Math.random() * 45000);
