@@ -132,19 +132,19 @@
     scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // ── the logo: slash "Chia", split it, say what chia means ──
+  // ── the logo: the bottle pops in, the name slides out, then a blade splits "Chia" ──
   const brand = $('#brand');
   let brandT = [];
   function playBrand() {
     brandT.forEach(clearTimeout);
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { brand.classList.add('cut'); return; }
-    brand.classList.remove('cut', 'slash', 'hint');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { brand.classList.add('pop', 'open', 'cut'); return; }
+    brand.classList.remove('pop', 'open', 'slash', 'cut');
     void brand.offsetWidth;
     brandT = [
-      setTimeout(() => brand.classList.add('slash'), 450),
-      setTimeout(() => brand.classList.add('cut'), 650),
-      setTimeout(() => brand.classList.add('hint'), 1000),
-      setTimeout(() => brand.classList.remove('hint'), 4200),
+      setTimeout(() => brand.classList.add('pop'), 120),
+      setTimeout(() => brand.classList.add('open'), 700),
+      setTimeout(() => brand.classList.add('slash'), 1400),
+      setTimeout(() => brand.classList.add('cut'), 1600),
     ];
   }
   brand.addEventListener('click', playBrand);
@@ -262,7 +262,12 @@
 
   // ── the pay popup ──────────────────────────────────────
   const box = $('#qrBox');
-  const touch = matchMedia('(pointer: coarse)').matches;
+  // Swish (and the bank apps) only exist on phones and tablets, so the Open Swish button and the
+  // phone layout only show up there; touch laptops and desktops get the QR code to scan instead.
+  // A web page can't ask whether the app is installed, so a mobile OS is the best signal there is.
+  const touch = (navigator.userAgentData && navigator.userAgentData.mobile)
+    || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   let cur = null;
   function openPay(t) {
     const to = person(t.to);
