@@ -297,7 +297,7 @@
     const before = pay.filter(isPaid).map(tickKey).join();
     ticks = next;
     if (pay.filter(isPaid).map(tickKey).join() === before) return;
-    renderPay(); reapplySplits(); playTicks();
+    renderPay(); reapplySplits(); playTicks(); gotPaid();
   }
   function loadTicks() {
     if (!TICKS_ON || document.hidden) return;
@@ -313,6 +313,81 @@
         const back = { ...ticks }; if (old) back[key] = old; else delete back[key];
         takeTicks(back); alert("Couldn't save that. Check your connection and try again.");
       });
+  }
+
+  // ── who is this? The first "I've paid" tap says so; payments to them get celebrated ──
+  // Kept on this phone only (localStorage). Tapping "I've paid" for two different payers means it's
+  // someone settling up for others (an admin), so that phone never celebrates anything.
+  const WHO = 'kambuchia_who';
+  const loadWho = () => { try { return JSON.parse(localStorage.getItem(WHO)) || null; } catch (e) { return null; } };
+  const saveWho = w => { try { localStorage.setItem(WHO, JSON.stringify(w)); } catch (e) {} };
+  const paidTo = id => pay.filter(t => t.to === id && isPaid(t)).map(tickKey);
+  function identify(id) {
+    const w = loadWho();
+    if (!w) return saveWho({ id, many: false, seen: paidTo(id) }); // from now on, only new money counts
+    if (w.id !== id && !w.many) saveWho({ ...w, many: true });
+  }
+  function gotPaid() {
+    const w = loadWho();
+    if (!w || w.many) return;
+    const fresh = pay.filter(t => t.to === w.id && isPaid(t) && !w.seen.includes(tickKey(t)));
+    if (!fresh.length) return;
+    saveWho({ ...w, seen: w.seen.concat(fresh.map(tickKey)) });
+    celebrate(fresh);
+  }
+  // 💸 from the payer's face to the receiver's, and the amount floating off
+  function moneyFly(t) {
+    if (reduced()) return;
+    const btn = $(`#payList .pay-btn[data-i="${pay.indexOf(t)}"]`); if (!btn) return;
+    const avs = [...btn.querySelectorAll('.pair > .av, .pair > .split')]; // a face may be wrapped by a split
+    const a = avs[0].getBoundingClientRect(), b = avs[avs.length - 1].getBoundingClientRect();
+    const ax = a.left + a.width / 2, ay = a.top + a.height / 2, bx = b.left + b.width / 2, by = b.top + b.height / 2;
+    for (let k = 0; k < 4; k++) {
+      const m = document.createElement('span');
+      m.className = 'money'; m.textContent = '💸';
+      document.body.appendChild(m);
+      const lift = 34 + k * 8;
+      m.animate([
+        { transform: `translate(${ax - 10}px, ${ay - 10}px) scale(.4)`, opacity: 0 },
+        { transform: `translate(${ax - 10}px, ${ay - 18}px) scale(1)`, opacity: 1, offset: .15 },
+        { transform: `translate(${(ax + bx) / 2 - 10}px, ${Math.min(ay, by) - lift}px) rotate(${k % 2 ? 14 : -14}deg) scale(1.1)`, opacity: 1, offset: .55 },
+        { transform: `translate(${bx - 10}px, ${by - 10}px) scale(.5)`, opacity: 0 },
+      ], { duration: 900, delay: k * 110, easing: 'cubic-bezier(.4, 0, .3, 1)', fill: 'backwards' }).onfinish = () => m.remove();
+    }
+    const amt = document.createElement('span');
+    amt.className = 'money amt'; amt.textContent = '−' + krTxt(t.kr, 0);
+    document.body.appendChild(amt);
+    amt.animate([
+      { transform: `translate(${ax - 20}px, ${ay - 12}px)`, opacity: 0 },
+      { transform: `translate(${ax - 20}px, ${ay - 30}px)`, opacity: 1, offset: .25 },
+      { transform: `translate(${ax - 20}px, ${ay - 64}px)`, opacity: 0 },
+    ], { duration: 1300, easing: 'ease-out' }).onfinish = () => amt.remove();
+  }
+  // someone paid you: coins burst and a card with how much and from whom
+  function celebrate(list) {
+    const kr = list.reduce((s, t) => s + t.kr, 0), from = list.map(t => person(t.from).name);
+    const names = from.length > 1 ? from.slice(0, -1).join(', ') + ' and ' + from[from.length - 1] : from[0];
+    const card = document.createElement('div');
+    card.className = 'got'; card.setAttribute('role', 'status');
+    card.innerHTML = `<div class="faces">${list.map(t => face(t.from, 'sm')).join('')}</div><b>+${krTxt(kr, 0)}</b><span>from ${esc(names)}</span>`;
+    document.body.appendChild(card);
+    const bye = () => { card.onclick = null; card.animate([{ opacity: 1 }, { opacity: 0, transform: 'translate(-50%, -12px)' }], { duration: 250, fill: 'forwards' }).onfinish = () => card.remove(); };
+    card.onclick = bye; setTimeout(bye, 5000);
+    if (reduced()) return;
+    card.animate([{ opacity: 0, transform: 'translate(-50%, 16px) scale(.9)' }, { opacity: 1, transform: 'translate(-50%, 0) scale(1)' }], { duration: 420, easing: 'cubic-bezier(.3, 1.5, .5, 1)' });
+    const r = card.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + 30;
+    for (let k = 0; k < 18; k++) {
+      const c = document.createElement('span');
+      c.className = 'coin'; c.textContent = k % 3 ? '🪙' : '💰';
+      document.body.appendChild(c);
+      const ang = -Math.PI / 2 + (Math.random() - .5) * 2.4, sp = 110 + Math.random() * 120;
+      const dx = Math.cos(ang) * sp, dy = Math.sin(ang) * sp;
+      c.animate([
+        { transform: `translate(${cx - 11}px, ${cy - 11}px) scale(.3)`, opacity: 1 },
+        { transform: `translate(${cx - 11 + dx}px, ${cy - 11 + dy}px) rotate(${dx}deg) scale(1)`, opacity: 1, offset: .45 },
+        { transform: `translate(${cx - 11 + dx * 1.3}px, ${cy - 11 + dy + 260}px) rotate(${dx * 2}deg) scale(.9)`, opacity: 0 },
+      ], { duration: 1500 + Math.random() * 500, delay: Math.random() * 150, easing: 'cubic-bezier(.2, .6, .4, 1)' }).onfinish = () => c.remove();
+    }
   }
 
   // ── pay ────────────────────────────────────────────────
@@ -507,7 +582,9 @@
   $('#qrDone').onclick = closeBox;
   $('#qrPaid').onclick = () => {
     const t = pay.find(x => x.from === cur.from && x.to === cur.to); if (!t) return;
-    setTick(t, !isPaid(t)); closeBox();
+    const paying = !isPaid(t);
+    setTick(t, paying); closeBox();
+    if (paying) { identify(t.from); setTimeout(() => moneyFly(t), 260); }
   };
   box.addEventListener('click', e => { if (e.target === box) closeBox(); });
   box.addEventListener('cancel', e => { e.preventDefault(); closeBox(); });
@@ -585,7 +662,7 @@
     ({ bal, pay } = settle());
     pay.forEach(t => { t.m = methodFor(t); });
     renderHead(); renderPay(); renderBills(); renderPics();
-    showTab('pay'); reapplySplits(); playTicks();
+    showTab('pay'); reapplySplits(); playTicks(); gotPaid();
   }
   if (TICKS_ON) {
     setInterval(loadTicks, 20000);

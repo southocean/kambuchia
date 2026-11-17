@@ -82,6 +82,19 @@ img { display: block; }
   position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
   transition: transform .3s cubic-bezier(.2, 1.9, .4, 1) !important;
 }
+/* "I've paid": the money leaves the payer and lands with the one who's paid */
+.money { position: fixed; z-index: 60; left: 0; top: 0; pointer-events: none; font-size: 20px; line-height: 1; }
+.money.amt { font-size: 15px; font-weight: 900; color: var(--neg); text-shadow: 0 1px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
+/* someone paid you: a burst of coins and a card saying how much, from whom */
+.got {
+  position: fixed; z-index: 70; left: 50%; top: 22%; transform: translate(-50%, 0); width: min(320px, calc(100vw - 40px));
+  padding: 18px 18px 16px; border-radius: 22px; text-align: center; cursor: pointer;
+  background: var(--surface); box-shadow: 0 24px 70px rgba(0, 0, 0, .45); border-top: 6px solid var(--green);
+}
+.got .faces { display: flex; justify-content: center; gap: 4px; margin-bottom: 8px; }
+.got b { display: block; font-size: 34px; font-weight: 900; color: var(--green); letter-spacing: -.02em; }
+.got span { display: block; margin-top: 2px; color: var(--ink-2); font-weight: 600; }
+.coin { position: fixed; z-index: 69; left: 0; top: 0; pointer-events: none; font-size: 22px; line-height: 1; }
 .b-light { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #ffe3a3); }
 .b-light path { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
 .hero-text {
@@ -373,11 +386,19 @@ label.qr-amt { display: flex; align-items: baseline; justify-content: center; ga
 /* phones: big photo + Open Swish / Show QR code; Show QR code shrinks the photo and folds the QR code in */
 .modal.touch .qr-fold, .modal.touch.qr-on .act-fold { grid-template-rows: 0fr; opacity: 0; transform: translateY(8px) scale(.97); pointer-events: none; }
 .modal.touch.qr-on .qr-fold { grid-template-rows: 1fr; opacity: 1; transform: none; pointer-events: auto; transition-delay: .08s; }
+/* phones: the card is a column no taller than the screen; the photo is what gives way (it crops
+   top and bottom), so the amount and every button stay in view without scrolling */
+.modal.touch[open] { display: flex; flex-direction: column; }
+.modal.touch .modal-head { flex: none; }
+.modal.touch .modal-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.modal.touch .qr-main { flex: none; }
+.modal.touch .qr-code { max-width: min(100%, 44dvh); margin-inline: auto; }
 .modal.touch .qr-hero {
+  flex: 0 1 auto; min-height: 96px; height: auto;
   width: 100%; max-height: 60dvh; object-fit: cover; object-position: 50% 30%;
   transition: width .45s cubic-bezier(.2, .8, .2, 1), max-height .45s cubic-bezier(.2, .8, .2, 1), border-radius .45s ease, margin .45s ease;
 }
-.modal.touch.qr-on .qr-hero { width: 104px; max-height: 104px; aspect-ratio: 1; border-radius: 50%; margin-bottom: 10px; }
+.modal.touch.qr-on .qr-hero { flex: none; width: 104px; max-height: 104px; min-height: 0; aspect-ratio: 1; border-radius: 50%; margin-bottom: 10px; }
 .modal.closing { animation: popout .2s ease forwards; }
 .modal.closing::backdrop { animation: fadeout .2s ease forwards; }
 @keyframes popout { to { opacity: 0; transform: translateY(12px) scale(.96); } }
