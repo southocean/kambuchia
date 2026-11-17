@@ -305,6 +305,23 @@ label.qr-amt { display: flex; align-items: baseline; justify-content: center; ga
   background: var(--pc, var(--red)); color: #fff; font-weight: 800; font-size: 16px;
 }
 .qr-open[hidden], .qr-apps[hidden] { display: none; }
+.qr-hint { margin: 8px 0 0; text-align: center; color: var(--ink-2); font-size: 12.5px; }
+.qr-hint[hidden], .qr-actions[hidden] { display: none; }
+.qr-actions { display: grid; gap: 8px; margin-top: 16px; }
+.qr-actions .qr-open { margin-top: 0; }
+.qr-show {
+  display: block; width: 100%; padding: 13px; border: 2px solid color-mix(in srgb, var(--pc, var(--red)) 55%, var(--line));
+  border-radius: 999px; background: transparent; color: var(--ink); font: inherit; font-weight: 800; font-size: 15px; cursor: pointer;
+}
+.qr-done { display: none; margin-top: 14px; }
+/* phones: no QR code until asked for; then the QR code is the whole card */
+.modal.touch .qr-code { display: none; }
+.modal.touch.qr-on .qr-code, .modal.touch.qr-on .qr-done { display: block; }
+.modal.touch.qr-on .qr-hero, .modal.touch.qr-on .qr-actions, .modal.touch.qr-on .qr-apps { display: none; }
+/* computers, tapping a face: the photo on the left, amount and QR code on the right */
+.modal.wide { width: min(800px, calc(100vw - 48px)); }
+.modal.wide .modal-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); gap: 24px; align-items: center; }
+.modal.wide .qr-hero { margin: 0 auto; max-height: min(72vh, 600px); }
 .qr-apps p { margin: 12px 0 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); text-align: center; }
 .qr-apps div { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .qr-apps a { padding: 8px 12px; border-radius: 999px; background: var(--surface-2); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 13px; }

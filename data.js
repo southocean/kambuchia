@@ -13,8 +13,8 @@ window.PEOPLE = [
   { id: 'joakim', name: 'Joakim', color: '#c0392b', face: 'media/people/joakim.jpg', photo: 'media/people/full/joakim.jpg', pay: [{ kind: 'swish', n: 'MDc3NzUzMDY3NjQ=' }] },
   { id: 'huy', name: 'Huy', color: '#0e8fb3', face: 'media/people/huy.jpg', photo: 'media/people/full/huy.jpg', pay: [] },
   { id: 'toan', name: 'Toan', color: '#5d6d7e', face: 'media/people/toan.jpg', photo: 'media/people/full/toan.jpg', pay: [] },
-  { id: 'tony', name: 'Tony', color: '#8e6c3a', face: 'media/people/tony.jpg', photo: 'media/gallery/1.jpg', pay: [] },
-  { id: 'son', name: 'Son', color: '#2e8b57', face: 'media/people/son.jpg', photo: 'media/people/full/son.jpg', pay: [] },
+  { id: 'tony', name: 'Tony', color: '#8e6c3a', face: 'media/people/tony.jpg', photo: 'media/gallery/1.jpg', pay: [{ kind: 'swish', n: 'NzM3Mzg5OTA3NjQ=' }] },
+  { id: 'son', name: 'Son', color: '#2e8b57', face: 'media/people/son.jpg', photo: 'media/people/full/son.jpg', pay: [{ kind: 'swish', n: 'NTY3NDE3MDA3NjQ=' }] },
   { id: 'xuan', name: 'Spring', color: '#e0457b', face: 'media/people/spring.jpg', photo: 'media/people/full/spring.jpg', pay: [] },
   { id: 'thu', name: 'Autumn', color: '#b0762b', face: 'media/people/autumn.jpg', photo: 'media/people/full/autumn.jpg', pay: [] },
 ];

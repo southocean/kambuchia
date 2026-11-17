@@ -57,16 +57,25 @@
 
 <dialog id="qrBox" class="modal" aria-labelledby="qrTitle">
   <header class="modal-head"><h2 id="qrTitle"></h2><button class="x" id="qrClose" aria-label="Close">✕</button></header>
-  <img class="qr-hero" id="qrHero" alt="" hidden>
-  <div class="seg" id="qrSeg" role="tablist"></div>
-  <label class="qr-amt" id="qrAmtWrap"><input id="qrAmtIn" inputmode="decimal" placeholder="0" aria-label="Amount"><span id="qrUnit">kr</span></label>
-  <p class="qr-amt" id="qrAmt"></p>
-  <p class="qr-sub" id="qrSub"></p>
-  <div class="qr-code" id="qrCode"></div>
-  <p class="qr-none" id="qrNone" hidden></p>
-  <div class="qr-acct" id="qrAcct"></div>
-  <a class="qr-open" id="qrOpen" target="_blank" rel="noopener">Open Swish</a>
-  <div class="qr-apps" id="qrApps"></div>
+  <div class="modal-body">
+    <img class="qr-hero" id="qrHero" alt="" hidden>
+    <div class="qr-main">
+      <div class="seg" id="qrSeg" role="tablist"></div>
+      <label class="qr-amt" id="qrAmtWrap"><input id="qrAmtIn" inputmode="decimal" placeholder="0" aria-label="Amount"><span id="qrUnit">kr</span></label>
+      <p class="qr-amt" id="qrAmt"></p>
+      <p class="qr-sub" id="qrSub"></p>
+      <div class="qr-code" id="qrCode"></div>
+      <p class="qr-hint" id="qrHint">Scan with Swish on your phone</p>
+      <p class="qr-none" id="qrNone" hidden></p>
+      <div class="qr-acct" id="qrAcct"></div>
+      <div class="qr-actions" id="qrActions">
+        <a class="qr-open" id="qrOpen" target="_blank" rel="noopener">Open Swish</a>
+        <button class="qr-show" id="qrShow" type="button">Show QR code</button>
+      </div>
+      <div class="qr-apps" id="qrApps"></div>
+      <button class="qr-show qr-done" id="qrDone" type="button">Done</button>
+    </div>
+  </div>
 </dialog>
 
 <dialog id="viewer" class="viewer" aria-label="Photo">

@@ -254,6 +254,10 @@
       : `<span>Pay</span>${face(t.to, 'sm')}<span>${esc(to.name)}</span>`;
     const hero = $('#qrHero'), big = !t.from && to.face;
     hero.hidden = !big; if (big) { hero.src = to.photo || to.face; hero.alt = to.name; }
+    // phones: Open Swish first, the QR code only on request (and closing it closes the card);
+    // computers: the QR code straight away, next to the photo when there is one
+    box.classList.toggle('touch', touch); box.classList.remove('qr-on');
+    box.classList.toggle('wide', !!big && !touch);
     $('#qrSeg').innerHTML = to.pay.length > 1 ? to.pay.map((m, i) => `<button role="tab" data-m="${i}">${m.kind === 'swish' ? 'Swish' : esc(m.bank)}</button>`).join('') : '';
     $('#qrSeg').hidden = to.pay.length < 2;
     $('#qrAmtIn').value = '';
@@ -274,6 +278,7 @@
     const typed = parseFloat($('#qrAmtIn').value.replace(/\s/g, '').replace(',', '.')) || 0;
     let amount, payload;
     $('#qrAcct').innerHTML = ''; $('#qrOpen').hidden = true; $('#qrApps').hidden = true; $('#qrSub').textContent = '';
+    $('#qrActions').hidden = !touch || !m; $('#qrHint').hidden = touch || !m || bank;
     if (!m) {
       $('#qrAmt').textContent = krTxt(cur.kr || 0, 0);
     } else if (bank) {
@@ -301,6 +306,8 @@
     navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = '✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); });
   });
   $('#qrClose').onclick = () => box.close();
+  $('#qrShow').onclick = () => { box.classList.add('qr-on'); box.scrollTop = 0; };
+  $('#qrDone').onclick = () => box.close();
   box.addEventListener('click', e => { if (e.target === box) box.close(); });
 
   // ── photos ─────────────────────────────────────────────
