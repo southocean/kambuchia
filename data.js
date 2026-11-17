@@ -23,8 +23,8 @@ window.PEOPLE = [
 // `squarers`). Everyone else sends at most one, and is never asked to pass money on.
 window.SQUARERS = ['nam', 'tracy', 'jane', 'emma'];
 
-// Couples settle as one household: what one owes the other is just a note (no Swish needed), and
-// only the household's net amount goes out or comes in.
+// Couples settle as one household: one partner only pays (or is paid by) the other, and only the
+// household's net amount goes out to or comes in from everyone else.
 window.COUPLES = [['tony', 'tracy'], ['joakim', 'emma'], ['dauto', 'xuan']];
 
 // Newest first: the site opens on EVENTS[0].

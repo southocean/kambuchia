@@ -342,9 +342,6 @@ label.qr-amt { display: flex; align-items: baseline; justify-content: center; ga
 /* a payment to someone whose Swish number isn't in yet */
 .pay-row.nonum .qr-ic { background: var(--surface-2); color: var(--ink-2); box-shadow: none; }
 .pay-row.nonum .who small { color: var(--neg); }
-.pay-row.home .pay-btn { border-style: dashed; background: transparent; }
-.pay-row.home .who small { color: var(--ink-2); }
-.pay-row.home .qr-ic { background: var(--surface-2); color: var(--ink-2); box-shadow: none; }
 .qr-none { margin: 12px 0 0; padding: 22px 18px; border-radius: 16px; background: var(--surface-2); text-align: center; display: grid; gap: 6px; }
 .qr-none[hidden] { display: none; }
 .qr-none span { font-size: 13px; color: var(--ink-2); }

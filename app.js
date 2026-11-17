@@ -52,13 +52,14 @@
     // Then the squarers who were tipped over pay out what's still owed.
     const sq = new Set((EV.squarers || window.SQUARERS || []).filter(id => EV.crew.includes(id)));
     // Couples first: one partner (a squarer if there is one, else whoever is owed more) carries the
-    // household's net balance; the other settles with them at home, which needs no real Swish.
+    // household's net balance and the other pays (or is paid by) just their partner. The site shows it
+    // like any other Swish; couples sort it out between themselves.
     const unit = Object.fromEntries(whole.map(x => [x.id, x.v]));
     (EV.couples || window.COUPLES || []).filter(c => c.every(id => id in unit)).forEach(c => {
       const [rep, other] = c.slice().sort((a, b) => (sq.has(b) - sq.has(a)) || (unit[b] - unit[a]));
       const v = unit[other];
-      if (v < 0) out.pay.push({ from: other, to: rep, kr: -v, home: true });
-      if (v > 0) out.pay.push({ from: rep, to: other, kr: v, home: true });
+      if (v < 0) out.pay.push({ from: other, to: rep, kr: -v });
+      if (v > 0) out.pay.push({ from: rep, to: other, kr: v });
       unit[rep] += v; delete unit[other];
     });
     const units = Object.entries(unit).map(([id, v]) => ({ id, v }));
@@ -94,7 +95,7 @@
       if (!c.v) cred.shift();
     }
     // grouped by who gets paid, biggest first: easy to find your own row; the payers' squaring-up last
-    const late = t => t.home ? 2 : out.bal[t.from] > 0 ? 1 : 0;
+    const late = t => out.bal[t.from] > 0 ? 1 : 0;
     out.pay.sort((a, b) => (late(a) - late(b)) || (out.bal[b.to] - out.bal[a.to]) || (b.kr - a.kr));
     return out;
   }
@@ -137,8 +138,8 @@
       const made = (EV.payments || []).filter(p => p.from === t.from && p.to === t.to);
       const done = made.reduce((s, p) => s + p.kr, 0) >= t.kr - 0.5, receipt = made.find(p => p.photo);
       const to = person(t.to), m = to.pay[t.m], bank = m && m.kind === 'bank';
-      const via = t.home ? 'Couple · settle at home' : !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
-      return `<li class="pay-row${done ? ' paid' : ''}${m || t.home ? '' : ' nonum'}${t.home ? ' home' : ''}" style="--from:${person(t.from).color};--to:${to.color}">
+      const via = !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
+      return `<li class="pay-row${done ? ' paid' : ''}${m ? '' : ' nonum'}" style="--from:${person(t.from).color};--to:${to.color}">
         <button class="pay-btn" data-i="${i}"${receipt ? ` data-receipt="${esc(receipt.photo)}"` : ''}${done && !receipt ? ' disabled' : ''} aria-label="${esc(person(t.from).name)} pays ${esc(to.name)} ${t.kr} kr${done ? ', paid' : ''}">
           <span class="pair">${face(t.from)}<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 12" width="22" height="11"><path d="M0 6h20M15 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${face(t.to)}</span>
           <span class="who"><b>${esc(person(t.from).name)} <i>→</i> ${esc(to.name)}</b><small>${esc(via)}</small></span>
