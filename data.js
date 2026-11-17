@@ -15,8 +15,8 @@ window.PEOPLE = [
   { id: 'toan', name: 'Toan', color: '#5d6d7e', face: 'media/people/toan.jpg', pay: [] },
   { id: 'tony', name: 'Tony', color: '#8e6c3a', face: 'media/people/tony.jpg', pay: [] },
   { id: 'son', name: 'Son', color: '#2e8b57', face: 'media/people/son.jpg', pay: [] },
-  { id: 'xuan', name: 'Xuan', color: '#e0457b', pay: [] },
-  { id: 'thu', name: 'Thu', color: '#b0762b', pay: [] },
+  { id: 'xuan', name: 'Spring', color: '#e0457b', face: 'media/people/spring.jpg', pay: [] },
+  { id: 'thu', name: 'Autumn', color: '#b0762b', face: 'media/people/autumn.jpg', pay: [] },
 ];
 
 // Newest first: the site opens on EVENTS[0].
