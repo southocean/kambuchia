@@ -51,6 +51,7 @@ window.EVENTS = [
       { by: 'emma', what: 'ICA Kvantum', sub: 'Mall of Scandinavia · veggies & tofu', icon: '🥬', kr: 308.20, photo: 'media/receipts/ica-mos.jpg' },
       { by: 'tracy', what: 'ICA Supermarket', sub: 'Vanadis · drinks, chips & ice', icon: '🥤', kr: 225.86, photo: 'media/receipts/ica-vanadis.jpg' },
       { by: 'xuan', what: 'Snacks', icon: '🍿', kr: 135 },
+      { by: 'tracy', what: 'Chả tôm + chả mực', sub: 'Shrimp & squid cakes', icon: '🦐', kr: 620 },
     ],
     payments: [],
     photos: [
