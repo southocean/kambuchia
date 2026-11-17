@@ -13,6 +13,7 @@ Built on [Bị ốm birthday](https://github.com/southocean/bi-om-birthday).
   (Or set `hub` on an event to settle everything through one person.)
 - Mark a payment made: anyone can tap **I've paid** on its card (shared through a Google Sheet, see
   `tools/ticks.gs` and `TICKS_URL` in `data.js`), or add `{ from, to, kr, date, photo }` to the event's
-  `payments` to attach a receipt (blur phone numbers).
+  `payments` to attach a receipt (blur phone numbers). A payment for only part of a Swish shows as its
+  own paid row, with the rest left open as a second row.
 - Missing Swish numbers: see [NUMBERS.md](NUMBERS.md).
 - Local preview: `node tools/serve.js` → http://localhost:5180

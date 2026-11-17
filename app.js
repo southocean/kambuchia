@@ -290,7 +290,8 @@
   const TICKS_ON = !!TICKS;
   let ticks = {};
   const tickKey = t => `${EV.id}|${t.from}|${t.to}`;
-  const inData = t => (EV.payments || []).filter(p => p.from === t.from && p.to === t.to).reduce((s, p) => s + p.kr, 0) >= t.kr - 0.5;
+  const made = t => (EV.payments || []).filter(p => p.from === t.from && p.to === t.to).reduce((s, p) => s + p.kr, 0);
+  const inData = t => t.done || (!t.left && made(t) >= t.kr - 0.5);
   const isPaid = t => inData(t) || !!(ticks[tickKey(t)] && ticks[tickKey(t)].paid);
   function takeTicks(next) {
     if (!next || next.error) return;
@@ -393,8 +394,8 @@
   // ── pay ────────────────────────────────────────────────
   function renderPay() {
     const rows = pay.map((t, i) => {
-      const made = (EV.payments || []).filter(p => p.from === t.from && p.to === t.to);
-      const done = isPaid(t), receipt = made.find(p => p.photo);
+      const recs = (EV.payments || []).filter(p => p.from === t.from && p.to === t.to);
+      const done = isPaid(t), receipt = recs.find(p => p.photo);
       const to = person(t.to), m = to.pay[t.m], bank = m && m.kind === 'bank';
       const via = !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
       return `<li class="pay-row${done ? ' paid' : ''}${m ? '' : ' nonum'}" style="--from:${person(t.from).color};--to:${to.color}">
@@ -660,6 +661,12 @@
   function show(ev) {
     EV = ev;
     ({ bal, pay } = settle());
+    // a payment already made for part of a Swish (in EV.payments) gets its own paid row, and the
+    // rest stays open as a second row
+    pay = pay.flatMap(t => {
+      const s = made(t);
+      return s > 0.5 && s < t.kr - 0.5 ? [{ ...t, kr: s, done: true }, { ...t, kr: t.kr - s, left: true }] : [t];
+    });
     pay.forEach(t => { t.m = methodFor(t); });
     renderHead(); renderPay(); renderBills(); renderPics();
     showTab('pay'); reapplySplits(); playTicks(); gotPaid();

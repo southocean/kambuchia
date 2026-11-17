@@ -35,7 +35,7 @@ window.TICKS_URL = 'https://script.google.com/macros/s/AKfycbzZdgnpg1CrnSYozOXC5
 // Newest first: the site opens on EVENTS[0].
 // crew: who splits; hub (optional): everyone settles through them; bills.for (optional): who
 // shares that bill (default: the crew); bills.own: the payer's own items, taken off before splitting.
-// payments made: { from, to, kr, date, photo }. photos[0] is the cover; more go to the gallery.
+// payments made: { from, to, kr, date, photo }; part of a Swish paid shows as its own paid row. photos[0] is the cover; more go to the gallery.
 const GAME = ['emma', 'dauto', 'huy', 'toan', 'jane', 'tony', 'son', 'nam', 'tracy'];
 window.EVENTS = [
   {
@@ -53,7 +53,9 @@ window.EVENTS = [
       { by: 'xuan', what: 'Snacks', icon: '🍿', kr: 135 },
       { by: 'tracy', what: 'Chả tôm + chả mực', sub: 'Shrimp & squid cakes', icon: '🦐', kr: 620 },
     ],
-    payments: [],
+    payments: [
+      { from: 'nam', to: 'jane', kr: 28, date: '2026-11-17' },
+    ],
     photos: [
       { src: 'media/gallery/1.jpg', thumb: 'media/gallery/1-t.jpg', alt: 'The crew at Activate' },
       { src: 'media/gallery/2.jpg', thumb: 'media/gallery/2-t.jpg', alt: 'The hotpot spread' },
