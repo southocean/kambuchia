@@ -9,7 +9,7 @@ window.PEOPLE = [
   { id: 'tracy', name: 'Tracy', color: '#1f9e89', face: 'media/people/tracy.jpg', photo: 'media/people/full/tracy.jpg', pay: [] },
   { id: 'jane', name: 'Jane', color: '#e08a1e', face: 'media/people/jane.jpg', photo: 'media/people/full/jane.jpg', pay: [] },
   { id: 'emma', name: 'Emma', color: '#d94f8a', face: 'media/people/emma.jpg', photo: 'media/people/full/emma.jpg', pay: [{ kind: 'swish', n: 'MzIzMTQ1NTY3NjQ=' }] },
-  { id: 'dauto', name: 'Dauto', color: '#7a5af0', face: 'media/people/dauto.jpg', photo: 'media/people/full/dauto.jpg', pay: [] },
+  { id: 'dauto', name: 'Dauto', color: '#7a5af0', face: 'media/people/dauto.jpg', photo: 'media/people/full/dauto.jpg', pay: [{ kind: 'swish', n: 'NjE3MzU0MjM3NjQ=' }] },
   { id: 'joakim', name: 'Joakim', color: '#c0392b', face: 'media/people/joakim.jpg', photo: 'media/people/full/joakim.jpg', pay: [] },
   { id: 'huy', name: 'Huy', color: '#0e8fb3', face: 'media/people/huy.jpg', photo: 'media/people/full/huy.jpg', pay: [] },
   { id: 'toan', name: 'Toan', color: '#5d6d7e', face: 'media/people/toan.jpg', photo: 'media/people/full/toan.jpg', pay: [] },
@@ -22,6 +22,10 @@ window.PEOPLE = [
 // The only people who may send more than one Swish to settle an event (an event can set its own
 // `squarers`). Everyone else sends at most one, and is never asked to pass money on.
 window.SQUARERS = ['nam', 'tracy', 'jane', 'emma'];
+
+// Couples settle as one household: what one owes the other is just a note (no Swish needed), and
+// only the household's net amount goes out or comes in.
+window.COUPLES = [['tony', 'tracy'], ['joakim', 'emma'], ['dauto', 'xuan']];
 
 // Newest first: the site opens on EVENTS[0].
 // crew: who splits; hub (optional): everyone settles through them; bills.for (optional): who

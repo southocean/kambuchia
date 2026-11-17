@@ -7,11 +7,12 @@ Needed now (they get paid for Activate Hotpot):
 
 - [ ] Tracy
 - [ ] Jane
-- [ ] Dauto
 
-Later (only if they ever pay a bill): Joakim, Huy, Toan, Tony, Son, Spring (Xuan), Autumn (Thu).
+Wanted too: Spring (Xuan), since Dauto passes her share on at home.
 
-Have it: Nam, Emma.
+Later (only if they ever pay a bill): Joakim, Huy, Toan, Tony, Son, Autumn (Thu).
+
+Have it: Nam, Emma, Dauto.
 
 Numbers go in `data.js` → `PEOPLE[].pay` as `{ kind: 'swish', n: '<scrambled>' }`
 (the number with country code, e.g. 46701234567, reversed, then base64).

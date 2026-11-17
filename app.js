@@ -51,9 +51,20 @@
     // match first, else the tightest fit), and only a squarer may be tipped past what they're owed.
     // Then the squarers who were tipped over pay out what's still owed.
     const sq = new Set((EV.squarers || window.SQUARERS || []).filter(id => EV.crew.includes(id)));
-    const rem = Object.fromEntries(whole.filter(x => x.v > 0).map(x => [x.id, x.v]));
-    const once = whole.filter(x => x.v < 0 && !sq.has(x.id)).sort((a, b) => a.v - b.v);
-    const owing = whole.filter(x => x.v < 0 && sq.has(x.id)).map(x => ({ id: x.id, v: -x.v }));
+    // Couples first: one partner (a squarer if there is one, else whoever is owed more) carries the
+    // household's net balance; the other settles with them at home, which needs no real Swish.
+    const unit = Object.fromEntries(whole.map(x => [x.id, x.v]));
+    (EV.couples || window.COUPLES || []).filter(c => c.every(id => id in unit)).forEach(c => {
+      const [rep, other] = c.slice().sort((a, b) => (sq.has(b) - sq.has(a)) || (unit[b] - unit[a]));
+      const v = unit[other];
+      if (v < 0) out.pay.push({ from: other, to: rep, kr: -v, home: true });
+      if (v > 0) out.pay.push({ from: rep, to: other, kr: v, home: true });
+      unit[rep] += v; delete unit[other];
+    });
+    const units = Object.entries(unit).map(([id, v]) => ({ id, v }));
+    const rem = Object.fromEntries(units.filter(x => x.v > 0).map(x => [x.id, x.v]));
+    const once = units.filter(x => x.v < 0 && !sq.has(x.id)).sort((a, b) => a.v - b.v);
+    const owing = units.filter(x => x.v < 0 && sq.has(x.id)).map(x => ({ id: x.id, v: -x.v }));
     once.forEach(x => {
       const kr = -x.v, open = Object.keys(rem).filter(id => rem[id] > 0);
       const fits = open.filter(id => rem[id] >= kr).sort((a, b) => rem[a] - rem[b]);
@@ -64,6 +75,16 @@
     });
     const debt = owing.concat(Object.entries(rem).filter(([, v]) => v < 0).map(([id, v]) => ({ id, v: -v })));
     const cred = Object.entries(rem).filter(([, v]) => v > 0).map(([id, v]) => ({ id, v }));
+    // the first squarer (Nam) does the passing on: the others send ONE Swish where it fits whole
+    const lead = [...sq][0];
+    debt.filter(d => d.id !== lead && debt.some(x => x.id === lead)).forEach(d => {
+      const c = cred.find(c => c.v === d.v) || cred.filter(c => c.v >= d.v).sort((a, b) => b.v - a.v)[0];
+      if (!c) return;
+      out.pay.push({ from: d.id, to: c.id, kr: d.v });
+      c.v -= d.v; d.v = 0;
+    });
+    for (let i = debt.length; i--;) if (!debt[i].v) debt.splice(i, 1);
+    for (let i = cred.length; i--;) if (!cred[i].v) cred.splice(i, 1);
     while (debt.length && cred.length) {
       debt.sort((a, b) => b.v - a.v); cred.sort((a, b) => b.v - a.v);
       const d = debt[0], c = cred[0], amt = Math.min(d.v, c.v);
@@ -73,7 +94,7 @@
       if (!c.v) cred.shift();
     }
     // grouped by who gets paid, biggest first: easy to find your own row; the payers' squaring-up last
-    const late = t => out.bal[t.from] > 0 ? 1 : 0;
+    const late = t => t.home ? 2 : out.bal[t.from] > 0 ? 1 : 0;
     out.pay.sort((a, b) => (late(a) - late(b)) || (out.bal[b.to] - out.bal[a.to]) || (b.kr - a.kr));
     return out;
   }
@@ -116,8 +137,8 @@
       const made = (EV.payments || []).filter(p => p.from === t.from && p.to === t.to);
       const done = made.reduce((s, p) => s + p.kr, 0) >= t.kr - 0.5, receipt = made.find(p => p.photo);
       const to = person(t.to), m = to.pay[t.m], bank = m && m.kind === 'bank';
-      const via = !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
-      return `<li class="pay-row${done ? ' paid' : ''}${m ? '' : ' nonum'}" style="--from:${person(t.from).color};--to:${to.color}">
+      const via = t.home ? 'Couple · settle at home' : !m ? 'Swish number coming' : bank ? m.bank : 'Swish';
+      return `<li class="pay-row${done ? ' paid' : ''}${m || t.home ? '' : ' nonum'}${t.home ? ' home' : ''}" style="--from:${person(t.from).color};--to:${to.color}">
         <button class="pay-btn" data-i="${i}"${receipt ? ` data-receipt="${esc(receipt.photo)}"` : ''}${done && !receipt ? ' disabled' : ''} aria-label="${esc(person(t.from).name)} pays ${esc(to.name)} ${t.kr} kr${done ? ', paid' : ''}">
           <span class="pair">${face(t.from)}<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 12" width="22" height="11"><path d="M0 6h20M15 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${face(t.to)}</span>
           <span class="who"><b>${esc(person(t.from).name)} <i>→</i> ${esc(to.name)}</b><small>${esc(via)}</small></span>
