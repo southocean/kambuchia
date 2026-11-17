@@ -3,20 +3,20 @@
 // text; app.js unscrambles them only to build a QR code or a payment link.
 // Numbers still missing: see NUMBERS.md.
 
-// Everyone who has ever been to a KambuChia event. face: a square photo (none → initials).
+// Everyone who has ever been to a KambuChia event. face: a square photo (none → initials); photo: the full picture shown when you tap them.
 window.PEOPLE = [
-  { id: 'nam', name: 'Nam', color: '#2f7de1', face: 'media/people/nam.jpg', pay: [{ kind: 'swish', n: 'MjU4NTQ2NTI3NjQ=' }] },
-  { id: 'tracy', name: 'Tracy', color: '#1f9e89', face: 'media/people/tracy.jpg', pay: [] },
-  { id: 'jane', name: 'Jane', color: '#e08a1e', face: 'media/people/jane.jpg', pay: [] },
-  { id: 'emma', name: 'Emma', color: '#d94f8a', face: 'media/people/emma.jpg', pay: [{ kind: 'swish', n: 'MzIzMTQ1NTY3NjQ=' }] },
-  { id: 'dauto', name: 'Dauto', color: '#7a5af0', face: 'media/people/dauto.jpg', pay: [] },
-  { id: 'joakim', name: 'Joakim', color: '#c0392b', face: 'media/people/joakim.jpg', pay: [] },
-  { id: 'huy', name: 'Huy', color: '#0e8fb3', face: 'media/people/huy.jpg', pay: [] },
-  { id: 'toan', name: 'Toan', color: '#5d6d7e', face: 'media/people/toan.jpg', pay: [] },
-  { id: 'tony', name: 'Tony', color: '#8e6c3a', face: 'media/people/tony.jpg', pay: [] },
-  { id: 'son', name: 'Son', color: '#2e8b57', face: 'media/people/son.jpg', pay: [] },
-  { id: 'xuan', name: 'Spring', color: '#e0457b', face: 'media/people/spring.jpg', pay: [] },
-  { id: 'thu', name: 'Autumn', color: '#b0762b', face: 'media/people/autumn.jpg', pay: [] },
+  { id: 'nam', name: 'Nam', color: '#2f7de1', face: 'media/people/nam.jpg', photo: 'media/gallery/1.jpg', pay: [{ kind: 'swish', n: 'MjU4NTQ2NTI3NjQ=' }] },
+  { id: 'tracy', name: 'Tracy', color: '#1f9e89', face: 'media/people/tracy.jpg', photo: 'media/people/full/tracy.jpg', pay: [] },
+  { id: 'jane', name: 'Jane', color: '#e08a1e', face: 'media/people/jane.jpg', photo: 'media/people/full/jane.jpg', pay: [] },
+  { id: 'emma', name: 'Emma', color: '#d94f8a', face: 'media/people/emma.jpg', photo: 'media/people/full/emma.jpg', pay: [{ kind: 'swish', n: 'MzIzMTQ1NTY3NjQ=' }] },
+  { id: 'dauto', name: 'Dauto', color: '#7a5af0', face: 'media/people/dauto.jpg', photo: 'media/people/full/dauto.jpg', pay: [] },
+  { id: 'joakim', name: 'Joakim', color: '#c0392b', face: 'media/people/joakim.jpg', photo: 'media/people/full/joakim.jpg', pay: [] },
+  { id: 'huy', name: 'Huy', color: '#0e8fb3', face: 'media/people/huy.jpg', photo: 'media/people/full/huy.jpg', pay: [] },
+  { id: 'toan', name: 'Toan', color: '#5d6d7e', face: 'media/people/toan.jpg', photo: 'media/people/full/toan.jpg', pay: [] },
+  { id: 'tony', name: 'Tony', color: '#8e6c3a', face: 'media/people/tony.jpg', photo: 'media/gallery/1.jpg', pay: [] },
+  { id: 'son', name: 'Son', color: '#2e8b57', face: 'media/people/son.jpg', photo: 'media/people/full/son.jpg', pay: [] },
+  { id: 'xuan', name: 'Spring', color: '#e0457b', face: 'media/people/spring.jpg', photo: 'media/people/full/spring.jpg', pay: [] },
+  { id: 'thu', name: 'Autumn', color: '#b0762b', face: 'media/people/autumn.jpg', photo: 'media/people/full/autumn.jpg', pay: [] },
 ];
 
 // Newest first: the site opens on EVENTS[0].
