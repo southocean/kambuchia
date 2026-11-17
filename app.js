@@ -305,10 +305,17 @@
     const b = e.target.closest('.copy'); if (!b) return;
     navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = '✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); });
   });
-  $('#qrClose').onclick = () => box.close();
-  $('#qrShow').onclick = () => { box.classList.add('qr-on'); box.scrollTop = 0; };
-  $('#qrDone').onclick = () => box.close();
-  box.addEventListener('click', e => { if (e.target === box) box.close(); });
+  // closing plays the card's exit animation first
+  const closeBox = () => {
+    if (!box.open || box.classList.contains('closing')) return;
+    box.classList.add('closing');
+    setTimeout(() => { box.classList.remove('closing'); box.close(); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 200);
+  };
+  $('#qrClose').onclick = closeBox;
+  $('#qrShow').onclick = () => box.classList.add('qr-on');
+  $('#qrDone').onclick = closeBox;
+  box.addEventListener('click', e => { if (e.target === box) closeBox(); });
+  box.addEventListener('cancel', e => { e.preventDefault(); closeBox(); });
 
   // ── photos ─────────────────────────────────────────────
   // A swipeable strip; tap one for the full-screen viewer (swipe, arrows, ←/→).
