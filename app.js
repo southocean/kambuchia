@@ -132,20 +132,51 @@
     scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // ── the logo: the bottle pops in, the name slides out, then a blade splits "Chia" ──
-  const brand = $('#brand');
-  let brandT = [];
+  // ── the logo: the bottle pops in, the name slides out, then a streak of light slices "Chia",
+  // U-turns up and over, and comes straight down through the bottle ──
+  const brand = $('#brand'), light = $('#bLight');
+  let brandT = [], lightA;
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function streak() {
+    const o = brand.getBoundingClientRect(), C = brand.querySelector('.b-chia').getBoundingClientRect();
+    const B = brand.querySelector('.b-bottle').getBoundingClientRect();
+    const z = o.width / brand.offsetWidth || 1; // screen px → the logo's own px (page zoom etc.)
+    const cx = (C.left - o.left) / z, cy = (C.top - o.top) / z, W = C.width / z, H = C.height / z;
+    // the slant through Chia (same as the clip line: 66% height on the left, 36% on the right), extended 8px
+    const k = .30 * H / W, x0 = cx - 8, y0 = cy + .66 * H + 8 * k, x1 = cx + W + 8, y1 = cy + .36 * H - 8 * k;
+    const len = Math.hypot(W + 16, y1 - y0), ux = (W + 16) / len, uy = (y1 - y0) / len;
+    const bx = (B.left - o.left + B.width / 2) / z, by = (B.bottom - o.top) / z + 6;
+    const seg1 = `M${x0},${y0} L${x1},${y1}`;
+    // the U-turn stays low (the badge sits near the top of the screen), so most of it is on screen
+    const seg2 = `M${x1},${y1} C${x1 + ux * 40},${y1 + uy * 40} ${bx},${-22} ${bx},${0}`;
+    const seg3 = `M${bx},${0} L${bx},${by}`;
+    const L = d => { light.setAttribute('d', d); return light.getTotalLength(); };
+    const l1 = L(seg1), l2 = L(seg2), l3 = L(seg3), all = l1 + l2 + l3, dash = 18;
+    light.setAttribute('d', seg1 + ' ' + seg2.replace(/^M[^C]+/, '') + ' ' + seg3.replace(/^M[^L]+/, ''));
+    light.style.strokeDasharray = `${dash} ${all + dash}`;
+    // time: a fast slash through Chia, a smooth arc, a quick drop through the bottle, then the tail leaves
+    const t1 = 140, t2 = 380, t3 = 110, t4 = 70, T = t1 + t2 + t3 + t4;
+    if (lightA) lightA.cancel();
+    lightA = light.animate([
+      { strokeDashoffset: dash, opacity: 1, offset: 0 },
+      { strokeDashoffset: dash - l1, opacity: 1, offset: t1 / T, easing: 'cubic-bezier(.45, 0, .55, 1)' },
+      { strokeDashoffset: dash - l1 - l2, opacity: 1, offset: (t1 + t2) / T },
+      { strokeDashoffset: dash - all, opacity: 1, offset: (t1 + t2 + t3) / T },
+      { strokeDashoffset: -all, opacity: 1, offset: 1 },
+    ], { duration: T, fill: 'forwards' });
+    brandT.push(setTimeout(() => brand.classList.add('cut-c'), t1 - 20), setTimeout(() => brand.classList.add('cut-b'), t1 + t2 + t3 - 20));
+  }
   function playBrand() {
-    brandT.forEach(clearTimeout);
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { brand.classList.add('pop', 'open', 'cut'); return; }
-    brand.classList.remove('pop', 'open', 'slash', 'cut');
+    brandT.forEach(clearTimeout); brandT = [];
+    if (reduced()) { brand.classList.add('pop', 'open', 'cut-c', 'cut-b'); return; }
+    brand.classList.remove('pop', 'open', 'cut-c', 'cut-b');
+    if (lightA) lightA.cancel();
     void brand.offsetWidth;
-    brandT = [
+    brandT.push(
       setTimeout(() => brand.classList.add('pop'), 120),
-      setTimeout(() => brand.classList.add('open'), 700),
-      setTimeout(() => brand.classList.add('slash'), 1400),
-      setTimeout(() => brand.classList.add('cut'), 1600),
-    ];
+      setTimeout(() => brand.classList.add('open'), 650),
+      setTimeout(streak, 1300),
+    );
   }
   brand.addEventListener('click', playBrand);
   playBrand();

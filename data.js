@@ -50,6 +50,12 @@ window.EVENTS = [
     payments: [],
     photos: [
       { src: 'media/gallery/1.jpg', thumb: 'media/gallery/1-t.jpg', alt: 'The crew at Activate' },
+      { src: 'media/gallery/2.jpg', thumb: 'media/gallery/2-t.jpg', alt: 'The hotpot spread' },
+      { src: 'media/gallery/3.jpg', thumb: 'media/gallery/3-t.jpg', alt: 'Meat for the hotpot' },
+      { video: true, src: 'media/gallery/v1.mp4', poster: 'media/gallery/v1.jpg', alt: 'Hotpot time' },
+      { video: true, src: 'media/gallery/v2.mp4', poster: 'media/gallery/v2.jpg', alt: 'Karaoke' },
+      { video: true, src: 'media/gallery/v3.mp4', poster: 'media/gallery/v3.jpg', alt: 'More karaoke' },
+      { video: true, src: 'media/gallery/v4.mp4', poster: 'media/gallery/v4.jpg', alt: 'Laughing too hard' },
     ],
   },
 ];
