@@ -55,6 +55,7 @@ window.EVENTS = [
     ],
     payments: [
       { from: 'nam', to: 'jane', kr: 28, date: '2026-11-17' },
+      { from: 'nam', to: 'jane', kr: 137, date: '2026-11-17' },
     ],
     photos: [
       { src: 'media/gallery/1.jpg', thumb: 'media/gallery/1-t.jpg', alt: 'The crew at Activate' },

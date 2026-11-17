@@ -582,7 +582,8 @@
   $('#qrShow').onclick = () => box.classList.add('qr-on');
   $('#qrDone').onclick = closeBox;
   $('#qrPaid').onclick = () => {
-    const t = pay.find(x => x.from === cur.from && x.to === cur.to); if (!t) return;
+    // match the exact row: a part-paid Swish has two rows with the same payer and payee
+    const t = pay.find(x => x.from === cur.from && x.to === cur.to && !x.done === !cur.done && !x.left === !cur.left); if (!t) return;
     const paying = !isPaid(t);
     setTick(t, paying); closeBox();
     if (paying) { identify(t.from); setTimeout(() => moneyFly(t), 260); }
