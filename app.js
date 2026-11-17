@@ -135,7 +135,7 @@
   // ── the logo: the bottle pops in, the name slides out, then a streak of light slices "Chia",
   // U-turns up and over, and comes straight down through the bottle ──
   const brand = $('#brand'), light = $('#bLight');
-  let brandT = [], lightA;
+  let brandT = [], lightA, lightF;
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   function streak() {
     const o = brand.getBoundingClientRect(), C = brand.querySelector('.b-chia').getBoundingClientRect();
@@ -157,12 +157,20 @@
     // time: a fast slash through Chia, a smooth arc, a quick drop through the bottle, then the tail leaves
     const t1 = 140, t2 = 380, t3 = 110, t4 = 70, T = t1 + t2 + t3 + t4;
     if (lightA) lightA.cancel();
+    if (lightF) lightF.cancel();
     lightA = light.animate([
-      { strokeDashoffset: dash, opacity: 1, offset: 0 },
-      { strokeDashoffset: dash - l1, opacity: 1, offset: t1 / T, easing: 'cubic-bezier(.45, 0, .55, 1)' },
-      { strokeDashoffset: dash - l1 - l2, opacity: 1, offset: (t1 + t2) / T },
-      { strokeDashoffset: dash - all, opacity: 1, offset: (t1 + t2 + t3) / T },
-      { strokeDashoffset: -all, opacity: 1, offset: 1 },
+      { strokeDashoffset: dash, offset: 0 },
+      { strokeDashoffset: dash - l1, offset: t1 / T, easing: 'cubic-bezier(.45, 0, .55, 1)' },
+      { strokeDashoffset: dash - l1 - l2, offset: (t1 + t2) / T },
+      { strokeDashoffset: dash - all, offset: (t1 + t2 + t3) / T },
+      { strokeDashoffset: -all, offset: 1 },
+    ], { duration: T, fill: 'forwards' });
+    // it seems done after Chia: the light dies out early in the U-turn and only flares up again
+    // just before it drops into the bottle
+    const at = ms => Math.min(1, ms / T);
+    lightF = light.animate([
+      { opacity: 1, offset: 0 }, { opacity: 1, offset: at(t1 + 20) }, { opacity: 0, offset: at(t1 + 90) },
+      { opacity: 0, offset: at(t1 + t2 - 70) }, { opacity: 1, offset: at(t1 + t2 - 10) }, { opacity: 1, offset: 1 },
     ], { duration: T, fill: 'forwards' });
     brandT.push(setTimeout(() => brand.classList.add('cut-c'), t1 - 20), setTimeout(() => brand.classList.add('cut-b'), t1 + t2 + t3 - 20));
   }
@@ -171,6 +179,7 @@
     if (reduced()) { brand.classList.add('pop', 'open', 'cut-c', 'cut-b'); return; }
     brand.classList.remove('pop', 'open', 'cut-c', 'cut-b');
     if (lightA) lightA.cancel();
+    if (lightF) lightF.cancel();
     void brand.offsetWidth;
     brandT.push(
       setTimeout(() => brand.classList.add('pop'), 120),
@@ -180,6 +189,61 @@
   }
   brand.addEventListener('click', playBrand);
   playBrand();
+
+  // ── now and then, the same light splits someone's face ──
+  // After ~40 s on the page, a streak flashes across a random face on screen at a random angle and
+  // cuts it in two, then it's gone, until the next one 35-80 s later. Split faces stay split.
+  function zap(img) {
+    const r = img.getBoundingClientRect(), D = Math.max(r.width, r.height);
+    const th = Math.random() * Math.PI, dx = Math.cos(th), dy = Math.sin(th);
+    // the streak: a short comet riding a line through the face's centre
+    const z = document.createElement('div');
+    z.className = 'zap';
+    z.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;width:${D * 3}px;transform:translate(-50%,-50%) rotate(${th}rad)`;
+    z.innerHTML = '<i></i>';
+    document.body.appendChild(z);
+    const run = z.firstChild.animate([
+      { transform: `translateX(${-D * 1.5}px)`, opacity: 0 }, { opacity: 1, offset: .25 },
+      { opacity: 1, offset: .7 }, { transform: `translateX(${D * 1.5}px)`, opacity: 0 },
+    ], { duration: 340, easing: 'cubic-bezier(.5, 0, .5, 1)' });
+    run.onfinish = () => z.remove();
+    setTimeout(() => cut(img, dx, dy), 160);
+  }
+  function cut(img, dx, dy) {
+    if (!img.isConnected) return;
+    const w = img.offsetWidth, h = img.offsetHeight;
+    const wrap = document.createElement('span');
+    wrap.className = 'split';
+    wrap.style.cssText = `width:${w}px;height:${h}px`;
+    img.replaceWith(wrap);
+    wrap.appendChild(img);
+    // two copies, each clipped to one side of the line through the centre (dx, dy), pushed apart along its normal
+    const nx = -dy, ny = dx, P = (x, y) => `${50 + x}% ${50 + y}%`;
+    [1, -1].forEach(side => {
+      const c = img.cloneNode();
+      c.classList.add('half');
+      c.style.clipPath = `polygon(${P(-dx * 200, -dy * 200)}, ${P(dx * 200, dy * 200)}, ${P(dx * 200 + nx * 200 * side, dy * 200 + ny * 200 * side)}, ${P(-dx * 200 + nx * 200 * side, -dy * 200 + ny * 200 * side)})`;
+      wrap.appendChild(c);
+      void c.offsetWidth; // lay it out unmoved first, so the push apart animates
+      c.style.transform = `translate(${nx * 2.5 * side}px, ${ny * 2.5 * side}px) rotate(${side * 4}deg)`;
+    });
+    img.style.visibility = 'hidden';
+  }
+  let zapT;
+  function zapLater(ms) {
+    clearTimeout(zapT);
+    zapT = setTimeout(() => {
+      if (document.hidden || document.querySelector('dialog[open]')) return zapLater(8000);
+      const vis = [...document.querySelectorAll('#faces img.av, #payList .pair img.av')].filter(el => {
+        const r = el.getBoundingClientRect();
+        return r.width > 24 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+      });
+      if (vis.length) zap(vis[Math.floor(Math.random() * vis.length)]);
+      zapLater(35000 + Math.random() * 45000);
+    }, ms);
+  }
+  // ?zap in the address starts the first one after a second (for previewing)
+  if (!reduced()) zapLater(/[?&]zap\b/.test(location.search) ? 1000 : 40000);
 
   // ── "I've paid": shared ticks (Google Sheet via tools/ticks.gs; tools/serve.js locally) ──
   // A tick is on trust: whoever taps it marks that payment paid for everyone. Payments listed in

@@ -70,6 +70,18 @@ img { display: block; }
 .brand.cut-c .b-chia .bot { transform: translate(.6px, 2.2px); }
 .brand.cut-b .b-bottle .l { transform: translateX(-1.6px) rotate(-6deg); }
 .brand.cut-b .b-bottle .r { transform: translateX(1.6px) rotate(6deg); }
+/* the light that now and then splits someone's face */
+.zap { position: fixed; z-index: 50; height: 2px; pointer-events: none; }
+.zap i {
+  position: absolute; left: 50%; top: 0; width: 26px; height: 2px; margin-left: -13px; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, transparent, #fff 60%, #fff); box-shadow: 0 0 6px #fff, 0 0 12px #ffe3a3;
+}
+.split { position: relative; display: inline-block; flex: none; vertical-align: middle; }
+.face-img .split { display: block; width: 100% !important; height: 100% !important; }
+.split .half {
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+  transition: transform .3s cubic-bezier(.2, 1.9, .4, 1) !important;
+}
 .b-light { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #ffe3a3); }
 .b-light path { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
 .hero-text {

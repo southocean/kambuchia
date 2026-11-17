@@ -29,7 +29,7 @@ window.COUPLES = [['tony', 'tracy'], ['joakim', 'emma'], ['dauto', 'xuan']];
 
 // Where the "I've paid" ticks are shared: the Google Apps Script web app from tools/ticks.gs
 // (its /exec URL). Empty: no "I've paid" button. The local preview uses tools/serve.js instead.
-window.TICKS_URL = '';
+window.TICKS_URL = 'https://script.google.com/macros/s/AKfycbzZdgnpg1CrnSYozOXC5LAKYqlBG51KWuRF8_j1Udh-WwGoB_UiHJaMqyK4yGVP2orA/exec';
 
 // Newest first: the site opens on EVENTS[0].
 // crew: who splits; hub (optional): everyone settles through them; bills.for (optional): who
