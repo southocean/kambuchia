@@ -188,7 +188,23 @@
     );
   }
   brand.addEventListener('click', playBrand);
-  playBrand();
+  // play it the first time it's actually seen: phones often reopen a page scrolled down or in the
+  // background, and the animation would run with nobody looking
+  let brandPlayed = false;
+  function tryBrand() {
+    if (brandPlayed || document.hidden) return;
+    const r = brand.getBoundingClientRect();
+    if (!r.height || r.top < -4 || r.bottom > innerHeight) return; // not (wholly) on screen yet
+    brandPlayed = true;
+    removeEventListener('scroll', tryBrand);
+    playBrand();
+  }
+  addEventListener('scroll', tryBrand, { passive: true });
+  addEventListener('pageshow', tryBrand);
+  document.addEventListener('visibilitychange', tryBrand);
+  // first look once the page has loaded: browsers put a restored scroll position back around then
+  const firstLook = () => setTimeout(tryBrand, 200);
+  if (document.readyState === 'complete') firstLook(); else addEventListener('load', firstLook);
 
   // ── now and then, the same light splits someone's face ──
   // After ~40 s on the page, a streak flashes across a random face on screen at a random angle and
@@ -209,8 +225,25 @@
     run.onfinish = () => z.remove();
     setTimeout(() => cut(img, dx, dy), 160);
   }
-  function cut(img, dx, dy) {
-    if (!img.isConnected) return;
+  const splits = new Map(); // which faces have been cut (and at what angle), so each is cut once
+  function splitKey(img) {
+    if (img.closest('#faces')) return 'f:' + img.closest('.face').dataset.to;
+    const b = img.closest('.pay-btn'), t = b && pay[+b.dataset.i];
+    return t ? `p:${t.from}>${t.to}:${[...img.closest('.pair').querySelectorAll('img.av:not(.half)')].indexOf(img)}` : '';
+  }
+  // after the faces are drawn again (a tick, a new event), the ones that were cut come back cut
+  function reapplySplits() {
+    document.querySelectorAll('#faces img.av, #payList .pair img.av').forEach(img => {
+      if (img.closest('.split')) return;
+      const s = splits.get(splitKey(img));
+      if (s) cut(img, s.dx, s.dy, true);
+    });
+  }
+  function cut(img, dx, dy, now) {
+    if (!img.isConnected || img.closest('.split')) return;
+    const key = splitKey(img);
+    if (!now && splits.has(key)) return;
+    splits.set(key, { dx, dy });
     const w = img.offsetWidth, h = img.offsetHeight;
     const wrap = document.createElement('span');
     wrap.className = 'split';
@@ -223,6 +256,7 @@
       const c = img.cloneNode();
       c.classList.add('half');
       c.style.clipPath = `polygon(${P(-dx * 200, -dy * 200)}, ${P(dx * 200, dy * 200)}, ${P(dx * 200 + nx * 200 * side, dy * 200 + ny * 200 * side)}, ${P(-dx * 200 + nx * 200 * side, -dy * 200 + ny * 200 * side)})`;
+      if (now) c.style.transition = 'none';
       wrap.appendChild(c);
       void c.offsetWidth; // lay it out unmoved first, so the push apart animates
       c.style.transform = `translate(${nx * 2.5 * side}px, ${ny * 2.5 * side}px) rotate(${side * 4}deg)`;
@@ -237,7 +271,7 @@
       // only a face you can fully see right now: wholly inside the window, not already split, and
       // the topmost thing at its centre (so not scrolled out of the face row or covered)
       const vis = [...document.querySelectorAll('#faces img.av, #payList .pair img.av')].filter(el => {
-        if (el.closest('.split')) return false;
+        if (el.closest('.split') || splits.has(splitKey(el))) return false;
         const r = el.getBoundingClientRect();
         if (r.width < 24 || r.top < 0 || r.left < 0 || r.bottom > innerHeight || r.right > innerWidth) return false;
         return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === el;
@@ -263,7 +297,7 @@
     const before = pay.filter(isPaid).map(tickKey).join();
     ticks = next;
     if (pay.filter(isPaid).map(tickKey).join() === before) return;
-    renderPay(); playTicks();
+    renderPay(); reapplySplits(); playTicks();
   }
   function loadTicks() {
     if (!TICKS_ON || document.hidden) return;
@@ -551,7 +585,7 @@
     ({ bal, pay } = settle());
     pay.forEach(t => { t.m = methodFor(t); });
     renderHead(); renderPay(); renderBills(); renderPics();
-    showTab('pay'); playTicks();
+    showTab('pay'); reapplySplits(); playTicks();
   }
   if (TICKS_ON) {
     setInterval(loadTicks, 20000);

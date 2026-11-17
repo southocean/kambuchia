@@ -321,7 +321,7 @@ dialog { color: var(--ink); }
 .modal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .modal-head h2 { flex: 1; display: flex; align-items: center; gap: 7px; margin: 0; font-size: 16px; font-weight: 700; min-width: 0; }
 .modal-head h2 i { font-style: normal; color: var(--ink-2); }
-.x { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--surface-2); cursor: pointer; font-size: 14px; }
+.x { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--surface-2); cursor: pointer; font-size: 19px; font-weight: 700; line-height: 1; }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; margin-bottom: 12px; border-radius: 999px; background: var(--surface-2); }
 .seg[hidden] { display: none; }
 .seg button { padding: 8px; border: 0; border-radius: 999px; background: transparent; font-weight: 700; cursor: pointer; }
