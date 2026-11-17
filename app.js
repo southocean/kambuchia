@@ -221,6 +221,8 @@
     $('#qrTitle').innerHTML = t.from
       ? `${face(t.from, 'sm')}<span>${esc(person(t.from).name)}</span><i>→</i>${face(t.to, 'sm')}<span>${esc(to.name)}</span>`
       : `<span>Pay</span>${face(t.to, 'sm')}<span>${esc(to.name)}</span>`;
+    const hero = $('#qrHero'), big = !t.from && to.face;
+    hero.hidden = !big; if (big) { hero.src = to.face; hero.alt = to.name; }
     $('#qrSeg').innerHTML = to.pay.length > 1 ? to.pay.map((m, i) => `<button role="tab" data-m="${i}">${m.kind === 'swish' ? 'Swish' : esc(m.bank)}</button>`).join('') : '';
     $('#qrSeg').hidden = to.pay.length < 2;
     $('#qrAmtIn').value = '';

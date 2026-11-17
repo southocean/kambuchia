@@ -284,6 +284,8 @@ dialog { color: var(--ink); }
 .seg[hidden] { display: none; }
 .seg button { padding: 8px; border: 0; border-radius: 999px; background: transparent; font-weight: 700; cursor: pointer; }
 .seg button[aria-selected="true"] { background: var(--surface); box-shadow: 0 1px 4px rgba(0, 0, 0, .12); color: var(--pc, var(--red)); }
+.qr-hero { display: block; width: min(100%, 220px, 28vh); aspect-ratio: 1; object-fit: cover; margin: 0 auto 14px; border-radius: 22px; border: 3px solid var(--pc, var(--red)); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.qr-hero[hidden] { display: none; }
 .qr-amt { display: block; margin: 0; text-align: center; font-size: 30px; font-weight: 900; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .qr-amt[hidden] { display: none; }
 label.qr-amt { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
