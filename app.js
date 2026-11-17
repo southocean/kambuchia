@@ -519,7 +519,7 @@
     box.classList.toggle('ticked', ticked); box.classList.toggle('can-tick', canTick);
     $('#qrPaid').textContent = ticked ? 'Paid ✓  ·  undo' : "I've paid";
     const hero = $('#qrHero'), big = !t.from && to.face;
-    hero.hidden = !big; if (big) { hero.src = to.photo || to.face; hero.alt = to.name; }
+    hero.hidden = !big; if (big) { hero.src = to.photo || to.face; hero.alt = to.name; hero.style.objectPosition = to.photoPos || ''; }
     // phones: Open Swish first, the QR code only on request (and closing it closes the card);
     // computers: the QR code straight away, next to the photo when there is one
     box.classList.toggle('touch', touch); box.classList.remove('qr-on');
